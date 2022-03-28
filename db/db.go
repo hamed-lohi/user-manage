@@ -27,6 +27,8 @@ type MongoClient struct {
 	*mongo.Client
 }
 
+//var _ mongo.Client = (*MongoClient)(nil)
+
 func New() *MongoClient {
 
 	if err := godotenv.Load(); err != nil {

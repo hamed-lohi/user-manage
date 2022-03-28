@@ -6,6 +6,7 @@ import (
 
 	"github.com/hamed-lohi/user-management/db"
 	"github.com/hamed-lohi/user-management/model"
+	"github.com/hamed-lohi/user-management/user"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -14,6 +15,9 @@ type UserStore struct {
 	// client     *db.MongoClient
 	// collection *mongo.Collection
 }
+
+// Verify Interface Compliance
+var _ user.Store = (*UserStore)(nil)
 
 func NewUserStore() *UserStore {
 	//cli.Database("user_management_db").Collection("users")
