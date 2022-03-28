@@ -14,6 +14,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const _dbName = "user_management_db"
+
+type Table string
+
+const (
+	Users     Table = "users"
+	Customers Table = "customers"
+)
+
 type MongoClient struct {
 	*mongo.Client
 }
@@ -36,15 +45,11 @@ func New() *MongoClient {
 	return &MongoClient{client}
 }
 
-func (cl *MongoClient) Dispose() {
-	if err := cl.Disconnect(context.TODO()); err != nil {
-		panic(err)
-	}
-}
+func Seed() {
 
-func (cl *MongoClient) Seed() {
-
-	coll := cl.Database("user_management_db").Collection("users")
+	cl := New()
+	defer cl.Dispose()
+	coll := cl.GetCollection(Users)
 
 	var result model.User
 	err := coll.FindOne(context.TODO(), bson.D{{"username", "Admin"}}).Decode(&result)
@@ -71,4 +76,15 @@ func (cl *MongoClient) Seed() {
 	// if err := cl.Disconnect(context.TODO()); err != nil {
 	// 	panic(err)
 	// }
+}
+
+func (cl *MongoClient) GetCollection(collName Table) *mongo.Collection {
+	return cl.Database(_dbName).Collection(string(collName))
+}
+
+func (cl *MongoClient) Dispose() {
+	fmt.Println("****** Disposing")
+	if err := cl.Disconnect(context.TODO()); err != nil {
+		panic(err)
+	}
 }

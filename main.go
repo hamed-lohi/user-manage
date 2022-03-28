@@ -46,12 +46,9 @@ func main() {
 
 	v1 := e.Group("/api")
 
-	cl := db.New()
-	defer cl.Dispose()
-	cl.Seed()
-	coll := cl.Database("user_management_db").Collection("users")
+	db.Seed()
 
-	us := store.NewUserStore(coll)
+	us := store.NewUserStore()
 	h := handler.NewHandler(us)
 	h.Register(v1)
 	e.Logger.Fatal(e.Start("127.0.0.1:8585"))

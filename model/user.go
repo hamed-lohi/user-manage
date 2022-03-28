@@ -10,8 +10,8 @@ import (
 type Role uint
 
 const (
-	Unknown Role = iota
-	Guest
+	//Unknown Role = iota
+	Guest Role = iota + 1
 	Member
 	Moderator
 	Admin
