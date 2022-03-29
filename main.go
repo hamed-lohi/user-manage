@@ -46,9 +46,9 @@ func main() {
 
 	v1 := e.Group("/api")
 
-	db.Seed()
+	dp := db.New()
 
-	us := store.NewUserStore()
+	us := store.NewUserStore(dp)
 	h := handler.NewHandler(us)
 	h.Register(v1)
 	e.Logger.Fatal(e.Start("127.0.0.1:8585"))
