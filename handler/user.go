@@ -127,6 +127,7 @@ func (h *Handler) UpdateProfile(c echo.Context) error {
 // @Accept  json
 // @Produce  json
 // @Param        id   path      string  true  "User ID"
+// @Param user body userUpdateRequest true "User details to update. At least **one** field is required."
 // @Success 200 {object} userResponse
 // @Failure 400 {object} utils.Error
 // @Failure 401 {object} utils.Error

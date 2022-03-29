@@ -263,6 +263,12 @@ paths:
         name: id
         required: true
         type: string
+      - description: User details to update. At least **one** field is required.
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handler.userUpdateRequest'
       produces:
       - application/json
       responses:

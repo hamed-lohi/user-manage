@@ -287,6 +287,15 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "User details to update. At least **one** field is required.",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.userUpdateRequest"
+                        }
                     }
                 ],
                 "responses": {
