@@ -1,6 +1,30 @@
 basePath: /api
 definitions:
-  handler.userLoginRequest:
+  customerror.Error:
+    properties:
+      errors:
+        additionalProperties: true
+        type: object
+    type: object
+  user.User:
+    properties:
+      bio:
+        description: '`bson:"bio"`'
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      password:
+        type: string
+      roles:
+        items:
+          type: integer
+        type: array
+      username:
+        type: string
+    type: object
+  user.userLoginRequest:
     properties:
       user:
         properties:
@@ -13,7 +37,7 @@ definitions:
         - password
         type: object
     type: object
-  handler.userRegisterRequest:
+  user.userRegisterRequest:
     properties:
       user:
         properties:
@@ -29,7 +53,7 @@ definitions:
         - username
         type: object
     type: object
-  handler.userResponse:
+  user.userResponse:
     properties:
       user:
         properties:
@@ -51,7 +75,7 @@ definitions:
             type: string
         type: object
     type: object
-  handler.userUpdateRequest:
+  user.userUpdateRequest:
     properties:
       user:
         properties:
@@ -63,30 +87,6 @@ definitions:
             type: string
           username:
             type: string
-        type: object
-    type: object
-  model.User:
-    properties:
-      bio:
-        description: '`bson:"bio"`'
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      password:
-        type: string
-      roles:
-        items:
-          type: integer
-        type: array
-      username:
-        type: string
-    type: object
-  utils.Error:
-    properties:
-      errors:
-        additionalProperties: true
         type: object
     type: object
 host: 127.0.0.1:8585
@@ -109,28 +109,28 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/model.User'
+              $ref: '#/definitions/user.User'
             type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Users list
@@ -147,26 +147,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handler.userRegisterRequest'
+          $ref: '#/definitions/user.userRegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Add new user
@@ -183,34 +183,34 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handler.userUpdateRequest'
+          $ref: '#/definitions/user.userUpdateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Update profile
@@ -234,19 +234,19 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Delete a user
@@ -268,34 +268,34 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handler.userUpdateRequest'
+          $ref: '#/definitions/user.userUpdateRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Update current user
@@ -313,27 +313,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       security:
       - ApiKeyAuth: []
       summary: Get the current user
@@ -351,26 +351,26 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handler.userRegisterRequest'
+          $ref: '#/definitions/user.userRegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       summary: Register a new user
       tags:
       - user
@@ -386,34 +386,34 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/handler.userLoginRequest'
+          $ref: '#/definitions/user.userLoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.userResponse'
+            $ref: '#/definitions/user.userResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "422":
           description: Unprocessable Entity
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils.Error'
+            $ref: '#/definitions/customerror.Error'
       summary: Login for existing user
       tags:
       - user

@@ -1,7 +1,7 @@
-package handler
+package user
 
 import (
-	"github.com/hamed-lohi/user-management/model"
+	"github.com/hamed-lohi/user-manage/identity"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,7 +19,7 @@ func newUserUpdateRequest() *userUpdateRequest {
 	return new(userUpdateRequest)
 }
 
-func (r *userUpdateRequest) populate(u *model.User) {
+func (r *userUpdateRequest) populate(u *User) {
 	r.User.Username = u.Username
 	r.User.Email = u.Email
 	r.User.Password = u.Password
@@ -31,7 +31,7 @@ func (r *userUpdateRequest) populate(u *model.User) {
 	// }
 }
 
-func (r *userUpdateRequest) bind(c echo.Context, u *model.User) error {
+func (r *userUpdateRequest) bind(c echo.Context, u *User) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ type userRegisterRequest struct {
 	} `json:"user"`
 }
 
-func (r *userRegisterRequest) bind(c echo.Context, u *model.User) error {
+func (r *userRegisterRequest) bind(c echo.Context, u *User) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}
@@ -79,15 +79,15 @@ func (r *userRegisterRequest) bind(c echo.Context, u *model.User) error {
 
 type userInsertRequest struct {
 	User struct {
-		Username string       `json:"username" validate:"required"`
-		Email    string       `json:"email" validate:"required,email"`
-		Password string       `json:"password" validate:"required"`
-		Bio      *string      `json:"bio"`
-		Roles    []model.Role `json:"roles"`
+		Username string          `json:"username" validate:"required"`
+		Email    string          `json:"email" validate:"required,email"`
+		Password string          `json:"password" validate:"required"`
+		Bio      *string         `json:"bio"`
+		Roles    []identity.Role `json:"roles"`
 	} `json:"user"`
 }
 
-func (r *userInsertRequest) bind(c echo.Context, u *model.User) error {
+func (r *userInsertRequest) bind(c echo.Context, u *User) error {
 	if err := c.Bind(r); err != nil {
 		return err
 	}

@@ -1,8 +1,7 @@
-package handler
+package user
 
 import (
-	"github.com/hamed-lohi/user-management/model"
-	"github.com/hamed-lohi/user-management/utils"
+	"github.com/hamed-lohi/user-manage/identity"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -13,12 +12,12 @@ type userResponse struct {
 		Email    string             `json:"email"`
 		Bio      *string            `json:"bio"`
 		Image    *string            `json:"image"`
-		Roles    []model.Role       `json:"roles"`
+		Roles    []identity.Role    `json:"roles"`
 		Token    string             `json:"token"`
 	} `json:"user"`
 }
 
-func newUserResponse(u *model.User, hasToken bool) *userResponse {
+func newUserResponse(u *User, hasToken bool) *userResponse {
 	r := new(userResponse)
 	r.User.ID = u.ID
 	r.User.Username = u.Username
@@ -28,7 +27,7 @@ func newUserResponse(u *model.User, hasToken bool) *userResponse {
 
 	//r.User.Image = u.Image
 	if hasToken {
-		r.User.Token = utils.GenerateJWT(u.ID, u.Roles)
+		r.User.Token = identity.GenerateJWT(u.ID, u.Roles)
 	}
 
 	return r
@@ -40,14 +39,14 @@ type usersResponse struct {
 	Email    string             `json:"email"`
 	Bio      *string            `json:"bio"`
 	//Image    *string      `json:"image"`
-	Roles []model.Role `json:"roles"`
+	Roles []identity.Role `json:"roles"`
 }
 
 type userListResponse struct {
 	Users []usersResponse `json:"users"`
 }
 
-func newUserListResponse(users []model.User) *userListResponse {
+func newUserListResponse(users []User) *userListResponse {
 	r := new(userListResponse)
 	cr := usersResponse{}
 	r.Users = make([]usersResponse, 0)

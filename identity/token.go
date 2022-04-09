@@ -1,4 +1,4 @@
-package middleware
+package identity
 
 import (
 	"fmt"
@@ -6,11 +6,20 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/hamed-lohi/user-management/model"
-	"github.com/hamed-lohi/user-management/utils"
+	"github.com/hamed-lohi/user-manage/customerror"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+)
+
+type Role uint
+
+const (
+	//Unknown Role = iota
+	Guest Role = iota + 1
+	Member
+	Moderator
+	Admin
 )
 
 type (
@@ -26,6 +35,18 @@ var (
 	ErrJWTMissing = echo.NewHTTPError(http.StatusUnauthorized, "missing or malformed jwt")
 	ErrJWTInvalid = echo.NewHTTPError(http.StatusForbidden, "invalid or expired jwt")
 )
+
+var JWTSecret = []byte("!-!SECRET!-!")
+
+func GenerateJWT(id primitive.ObjectID, roles []Role) string {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = id
+	claims["roles"] = roles
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	t, _ := token.SignedString(JWTSecret)
+	return t
+}
 
 func JWT(key interface{}) echo.MiddlewareFunc {
 	c := JWTConfig{}
@@ -44,7 +65,7 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 						return next(c)
 					}
 				}
-				return c.JSON(http.StatusUnauthorized, utils.NewError(err))
+				return c.JSON(http.StatusUnauthorized, customerror.NewError(err))
 			}
 			token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -53,7 +74,7 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 				return config.SigningKey, nil
 			})
 			if err != nil {
-				return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
+				return c.JSON(http.StatusForbidden, customerror.NewError(ErrJWTInvalid))
 			}
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userID, _ := primitive.ObjectIDFromHex(claims["id"].(string))
@@ -62,7 +83,7 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 				c.Set("roles", userRoles)
 				return next(c)
 			}
-			return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
+			return c.JSON(http.StatusForbidden, customerror.NewError(ErrJWTInvalid))
 		}
 	}
 }
@@ -81,7 +102,7 @@ func jwtFromHeader(header string, authScheme string) jwtExtractor {
 }
 
 // Route level middleware
-func CheckAccessByRole(r model.Role) echo.MiddlewareFunc {
+func CheckAccessByRole(r Role) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 
@@ -93,7 +114,7 @@ func CheckAccessByRole(r model.Role) echo.MiddlewareFunc {
 			}
 
 			for _, rol := range roles {
-				if model.Role(rol.(float64)) >= r {
+				if Role(rol.(float64)) >= r {
 					return next(c)
 				}
 			}
@@ -105,7 +126,7 @@ func CheckAccessByRole(r model.Role) echo.MiddlewareFunc {
 
 // --------------------------------------------------------------------------------- not used
 
-func CheckAccess(r model.Role) echo.MiddlewareFunc {
+func CheckAccess(r Role) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 
@@ -116,7 +137,7 @@ func CheckAccess(r model.Role) echo.MiddlewareFunc {
 
 }
 
-func CheckloginInfo(r model.Role) middleware.BasicAuthValidator {
+func CheckloginInfo(r Role) middleware.BasicAuthValidator {
 	return func(username, password string, c echo.Context) (bool, error) {
 		if username == "joe" && password == "secret" {
 			return true, nil

@@ -7,9 +7,7 @@ import (
 
 	"os"
 
-	"github.com/hamed-lohi/user-management/model"
 	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -32,7 +30,7 @@ type DBProvider struct {
 
 //var _ mongo.Client = (*MongoClient)(nil)
 
-func New() *DBProvider {
+func NewDBProvider() *DBProvider {
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -59,41 +57,9 @@ func New() *DBProvider {
 	// Ping mongoDB with Ping method
 	mdb.ping()
 
-	Seed(mdb)
+	//Seed(mdb)
 
 	return mdb
-}
-
-func Seed(dp *DBProvider) {
-
-	//defer cl.Dispose()
-	coll := dp.GetCollection(Users)
-
-	var result model.User
-	err := coll.FindOne(dp.Context, bson.M{"username": "Admin"}).Decode(&result) // context.TODO()
-	if err != nil {
-		// ErrNoDocuments means that the filter did not match any documents in
-		// the collection.
-		if err == mongo.ErrNoDocuments {
-			admin := &model.User{
-				//ID:       ,
-				Username: "Admin",
-				Email:    "admin@gmail.com",
-				//Password: "aaaa",
-				Bio:   new(string),
-				Roles: []model.Role{model.Admin},
-			}
-			admin.SetPassword("aaa")
-			coll.InsertOne(dp.Context, admin)
-			return
-		}
-		log.Fatal(err)
-	}
-	fmt.Printf("found document %v", result)
-
-	// if err := cl.Disconnect(context.TODO()); err != nil {
-	// 	panic(err)
-	// }
 }
 
 func (cl *DBProvider) GetCollection(collName Table) *mongo.Collection {

@@ -1,11 +1,9 @@
-package store
+package user
 
 import (
 	"fmt"
 
-	"github.com/hamed-lohi/user-management/db"
-	"github.com/hamed-lohi/user-management/model"
-	"github.com/hamed-lohi/user-management/user"
+	"github.com/hamed-lohi/user-manage/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,9 +15,9 @@ type UserStore struct {
 }
 
 // Verify Interface Compliance
-var _ user.Store = (*UserStore)(nil)
+//var _ user.Store = (*UserStore)(nil)
 
-func NewUserStore(dp *db.DBProvider) *UserStore {
+func NewStore(dp *db.DBProvider) *UserStore {
 	//cli.Database("user_management_db").Collection("users")
 	return &UserStore{
 		dbProvider: dp,
@@ -27,12 +25,12 @@ func NewUserStore(dp *db.DBProvider) *UserStore {
 	}
 }
 
-func (us *UserStore) GetUserList() (*[]model.User, error) {
+func (us *UserStore) GetUserList() (*[]User, error) {
 
 	coll := us.collection
 	// coll := cli.GetCollection(db.Users)
 
-	var users []model.User
+	var users []User
 	cursor, err := coll.Find(us.dbProvider.Context, bson.D{})
 	if err != nil {
 		return nil, err
@@ -40,7 +38,7 @@ func (us *UserStore) GetUserList() (*[]model.User, error) {
 
 	for cursor.Next(us.dbProvider.Context) {
 		//Create a value into which the single document can be decoded
-		var elem model.User
+		var elem User
 		err := cursor.Decode(&elem)
 		if err != nil {
 			//log.Fatal(err)
@@ -59,8 +57,8 @@ func (us *UserStore) GetUserList() (*[]model.User, error) {
 	return &users, nil
 }
 
-func (us *UserStore) GetByID(id primitive.ObjectID) (*model.User, error) {
-	var m model.User
+func (us *UserStore) GetByID(id primitive.ObjectID) (*User, error) {
+	var m User
 	fmt.Println(id)
 	if err := us.collection.FindOne(us.dbProvider.Context, bson.D{{"_id", id}}).Decode(&m); err != nil {
 		return nil, err
@@ -68,23 +66,23 @@ func (us *UserStore) GetByID(id primitive.ObjectID) (*model.User, error) {
 	return &m, nil
 }
 
-func (us *UserStore) GetByEmail(e string) (*model.User, error) {
-	var m model.User
+func (us *UserStore) GetByEmail(e string) (*User, error) {
+	var m User
 	if err := us.collection.FindOne(us.dbProvider.Context, bson.D{{"email", e}}).Decode(&m); err != nil {
 		return nil, err
 	}
 	return &m, nil
 }
 
-func (us *UserStore) GetByUsername(username string) (*model.User, error) {
-	var m model.User
+func (us *UserStore) GetByUsername(username string) (*User, error) {
+	var m User
 	if err := us.collection.FindOne(us.dbProvider.Context, bson.D{{"username", username}}).Decode(&m); err != nil {
 		return nil, err
 	}
 	return &m, nil
 }
 
-func (us *UserStore) Create(u *model.User) error {
+func (us *UserStore) Create(u *User) error {
 
 	if _, err := us.collection.InsertOne(us.dbProvider.Context, u); err != nil {
 		return err
@@ -92,7 +90,7 @@ func (us *UserStore) Create(u *model.User) error {
 	return nil
 }
 
-func (us *UserStore) Update(u *model.User) error {
+func (us *UserStore) Update(u *User) error {
 	filter := bson.M{"_id": u.ID}
 	if _, err := us.collection.ReplaceOne(us.dbProvider.Context, filter, u); err != nil {
 		return err

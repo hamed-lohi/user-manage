@@ -1,4 +1,4 @@
-module github.com/hamed-lohi/user-management
+module github.com/hamed-lohi/user-manage
 
 go 1.18
 
