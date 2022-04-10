@@ -15,6 +15,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var store *UserStore
+
 type userList struct {
 	Users []User `json:"users"`
 }
@@ -47,8 +49,6 @@ func (u *User) CheckPassword(plain string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
 	return err == nil
 }
-
-var store *UserStore
 
 func RegisterHandlers(v1 *echo.Group, dp *db.DBProvider) {
 
