@@ -39,7 +39,17 @@ func Login(c echo.Context) error {
 	if !u.CheckPassword(req.User.Password) {
 		return c.JSON(http.StatusForbidden, customerror.AccessForbidden())
 	}
-	return c.JSON(http.StatusOK, newUserResponse(u, true))
+
+	result := echo.Map{
+		"id":       u.ID,
+		"username": u.Username,
+		"email":    u.Email,
+		"bio":      u.Bio,
+		"roles":    u.Roles,
+		"token":    identity.GenerateJWT(u.ID, u.Roles),
+	}
+
+	return c.JSON(http.StatusOK, result) // newUserResponse(u, true)
 }
 
 // SignUp godoc
@@ -65,7 +75,17 @@ func SignUp(c echo.Context) error {
 	if err := store.Create(&u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, customerror.NewError(err))
 	}
-	return c.JSON(http.StatusCreated, newUserResponse(&u, true))
+
+	result := echo.Map{
+		"id":       u.ID,
+		"username": u.Username,
+		"email":    u.Email,
+		"bio":      u.Bio,
+		"roles":    u.Roles,
+		"token":    identity.GenerateJWT(u.ID, u.Roles),
+	}
+
+	return c.JSON(http.StatusCreated, result) // newUserResponse(&u, true)
 }
 
 // SignUp godoc
@@ -91,6 +111,15 @@ func InsertUser(c echo.Context) error {
 	if err := store.Create(&u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, customerror.NewError(err))
 	}
+
+	// result := echo.Map{
+	// 	"id":       u.ID,
+	// 	"username": u.Username,
+	// 	"email":    u.Email,
+	// 	"bio":      u.Bio,
+	// 	"roles":    u.Roles,
+	// }
+
 	return c.JSON(http.StatusCreated, newUserResponse(&u, false))
 }
 
@@ -163,6 +192,15 @@ func updateUser(c echo.Context, u *User) error {
 	if err := store.Update(u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, customerror.NewError(err))
 	}
+
+	// result := echo.Map{
+	// 	"id":       u.ID,
+	// 	"username": u.Username,
+	// 	"email":    u.Email,
+	// 	"bio":      u.Bio,
+	// 	"roles":    u.Roles,
+	// }
+
 	return c.JSON(http.StatusOK, newUserResponse(u, false))
 }
 
@@ -187,6 +225,7 @@ func DeleteUser(c echo.Context) error {
 	if err := store.Delete(objId); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, customerror.NewError(err))
 	}
+
 	return c.JSON(http.StatusOK, newUserResponse(&u, false))
 }
 
@@ -214,6 +253,7 @@ func CurrentUser(c echo.Context) error {
 	if u == nil {
 		return c.JSON(http.StatusNotFound, customerror.NotFound())
 	}
+
 	return c.JSON(http.StatusOK, newUserResponse(u, false))
 }
 
