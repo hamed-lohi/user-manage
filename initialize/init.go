@@ -1,11 +1,16 @@
 package initialize
 
 import (
+	"log"
+	"net/http"
+	_ "net/http/pprof"
+
 	"github.com/hamed-lohi/user-manage/db"
 	"github.com/hamed-lohi/user-manage/entity/user"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
+
+	echo_log "github.com/labstack/gommon/log"
 	"gopkg.in/go-playground/validator.v9"
 
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -27,7 +32,7 @@ func (v *Validator) Validate(i interface{}) error {
 
 func NewEcho() *echo.Echo {
 	e := echo.New()
-	e.Logger.SetLevel(log.DEBUG)
+	e.Logger.SetLevel(echo_log.DEBUG)
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -62,8 +67,15 @@ func InitializeWebServer() {
 	//h := handler.NewHandler(us)
 	//h.Register(v1)
 
+	//e.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
+
 	registerHandlers(v1, dp)
 	user.Seed(dp)
+
+	go func() {
+
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 	e.Logger.Fatal(e.Start("127.0.0.1:8585"))
 
 }
